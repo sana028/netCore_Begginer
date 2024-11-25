@@ -1,0 +1,99 @@
+﻿@model IEnumerable<DailyTasks>;
+@{
+    var modelList = Model.ToList();
+}
+
+<div class="d-flex flex-row justify-content-end">
+    <button class="btn btn-primary" id="addButton">
+        <a class="text-decoration-none text-white">+ Add</a>
+    </button>
+
+</div>
+@if (!Model.Any())
+{
+    <div class="d-flex justify-content-center">
+    <p>No tasks found.</p>
+    </div>
+}
+else
+{
+    <table class="table align-middle mb-0 bg-white">
+        <thead class="bg-light">
+            <tr>
+                <th>Name</th>
+                <th>Id</th>
+                <th>Assignee</th>
+                <th>Status</th>
+                <th>Issue type</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < modelList.Count; i++)
+            {
+                <tr>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <div class="">
+                                <p class="text-muted mb-0">@modelList[i].Task_name</p>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <p class="text-muted mb-0">@modelList[i]?.Task_id</p>
+                    </td>
+                    <td>
+                        <p class="text-muted mb-0">@modelList[i]?.Assignee</p>
+                    </td>
+                    <td>
+                        <span class="badge badge-success rounded-pill text-green border-1 border-green" style="color:black;border:1px solid;">@modelList[i]?.Status</span>
+                    </td>
+                    <td>@modelList[i]?.Issue_type</td>
+                    <td>
+                        <button type="button" class="btn btn-link btn-sm btn-rounded" id="editButton" data-task-id="@modelList[i]?.Task_id" data-toggle="tooltip" title="Edit">
+                            <i class="bi bi-pencil-fill"></i>
+                        </button>
+                      
+                        <button type="button" class="btn btn-link btn-sm btn-rounded" id="deleteButton" data-task-id="@modelList[i]?.Task_id"  data-toggle="tooltip" title="Delete">
+                            <i class="bi bi-trash3-fill"></i>
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+<div id="modalContainer"></div>
+
+
+<script>
+    $(document).ready(function () {
+        $('#addButton').on('click', function (event) {
+            event.preventDefault();
+            console.log("hitt");
+            $.get('@Url.Action("AddTask", "Home")', function (data) {
+                $('#modalContainer').html(data);
+                $('#addTaskModal').modal('show');
+            });
+        });
+        $(document).on('click', '#editButton', function (event) {
+            event.preventDefault();
+            console.log('editmodal');
+            var taskId = $(this).data('task-id');
+            $.get('@Url.Action("EditTask", "Home")', { taskID: taskId }, function (data) {
+                $('#modalContainer').html(data);
+                $('#addTaskModal').modal('show');
+            });
+        });
+
+        $(document).on('click', '#deleteButton', function (event) {
+            event.preventDefault();
+            var taskId = $(this).data('task-id');
+            console.log(taskId);
+            $.get('@Url.Action("DeleteTask", "Home")', { taskID: taskId }, function (data) {
+                $('#modalContainer').html(data);
+                $('#deleteModal').modal('show');
+            });
+        });
+    });
+</script>

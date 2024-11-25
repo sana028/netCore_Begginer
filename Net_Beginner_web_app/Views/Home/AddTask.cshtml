@@ -1,0 +1,85 @@
+﻿@model Net_Beginner_web_app.Models.DailyTasks
+@{
+}
+
+<div class="modal fade show" id="addTaskModal" tabindex="-1" aria-labelledby="exampleModalLabel" data-mdb-modal-initialized="true" style="display: block;" data-gtm-vis-first-on-screen2340190_1302="22072" data-gtm-vis-total-visible-time2340190_1302="100" data-gtm-vis-has-fired2340190_1302="1" aria-modal="true" role="dialog">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-body p-4">
+                <!-- Pills navs -->
+                <h1 class="d-flex text-center">@ViewBag.ActionType</h1>
+                <!-- Pills navs -->
+                <!-- Pills content -->
+                <div class="tab-content">
+                    <div class="tab-pane fade show active" id="pills-login" role="tabpanel" aria-labelledby="mdb-tab-login">
+                        <form method="post" asp-action=@ViewBag.ActionType asp-controller="Home" id="addTask" enctype="multipart/form-data">
+                            <!-- task name input -->
+                            <div class="form-outline mb-1" data-mdb-input-init="" data-mdb-input-initialized="true">
+                                <label class="form-label" for="loginName" style="margin-left: 0px;"><span style="color:red">*</span>Task Name</label>
+                                <input type="text" id="loginName" class="form-control" name="Task_name" asp-for="Task_name"/>
+                             </div>
+
+                            <!-- task id input -->
+                            <div class="form-outline mb-1" data-mdb-input-init="" data-mdb-input-initialized="true">
+                                <label class="form-label" for="loginPassword" style="margin-left: 0px;"><span style="color:red">*</span>Task Number</label>
+                                @if(ViewBag.ActionType == "EditTask"){
+                                <input type="text" id="loginPassword" class="form-control" name="Task_id" asp-for="Task_id" readonly>
+                                }else{
+                                <input type="text" id="loginPassword" class="form-control" name="Task_id" asp-for="Task_id">
+                                }
+                             </div>
+
+                            <!-- task id input -->
+                            <div class="form-outline mb-1 d-flex flex-row  gap-3" data-mdb-input-init="" data-mdb-input-initialized="true">
+                               <select name="Issue_type" class="form-select mt-3 mr-2" asp-for="Issue_type">
+                                   <option selected>issue_type</option>
+                                    @foreach (var issue in ViewBag.IssueTypes)
+                                    {
+                                     <option value="@issue">@issue</option>
+                                   }
+                               </select>
+                               
+                                <select name="Status" class="form-select mt-3 ml-2" asp-for="Status">
+                                    <option selected>Status</option>
+                                    @foreach (var status in ViewBag.Status)
+                                    {
+                                        <option value="@status">@status</option>
+                                    }
+                                </select>
+                             </div>
+                            <div class="form-outline mb-1" data-mdb-input-init="" data-mdb-input-initialized="true">
+                                <label class="form-label" for="loginPassword" style="margin-left: 0px;"><span style="color:red;">*</span>Assignee</label>
+                                <input type="text" id="loginPassword" class="form-control" name="Assignee" asp-for="Assignee">
+                             </div>
+                            <div class="form-group d-flex flex-column mb-1">
+                                <label class="form-label">Description</label>
+                                <textarea id="editor" class="form-control" name="Description" asp-for="Description"></textarea>
+                            </div>
+
+                            <div class="form-group mb-1">
+                                <label class="form-label">Attachments</label>
+                                <div class="d-flex flex-row" style="border:1px solid #ced4da; border-style:dashed; padding:5px;">
+                                    <div class="d-flex flex-row justify-content-center align-items-center">
+                                        <input type="file" class="form-control" name="Attachments" id="Attachments" asp-for="Attachments"/>
+                                 </div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex flex-row justify-content-end gap-3 mt-3">
+                                <button class="btn btn-secondary" id="closeBtn" data-bs-dismiss="modal">Close</button>
+                                <button type="submit" class="btn btn-primary" id="saveButton" data-action="@ViewBag.ActionType">
+                                    @(ViewBag.ActionType == "AddTask" ? "Save" : "Update")
+                                </button>
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+                <!-- Pills content -->
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+   
+</script>

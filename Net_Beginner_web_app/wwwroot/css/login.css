@@ -1,0 +1,28 @@
+﻿
+.title-position {
+    display: flex;
+    justify-content: center;
+}
+
+
+
+.card {
+    padding: 0.5rem 1.5rem;
+    box-shadow: 5px 5px 5px #0000008f;
+}
+
+p {
+    display: flex;
+    justify-content: center;
+}
+
+hr {
+    margin: 0;
+    margin-bottom: 10px;
+}
+
+.microsoft {
+    display: flex;
+    justify-content: center;
+    border: 1px solid #8080806e;
+}
