@@ -5,6 +5,7 @@ using Moq;
 using netCore_Begginer.Controllers;
 using netCore_Begginer.Interfaces;
 using netCore_Begginer.Models;
+using netCore_Begginer.Repository;
 using System.Threading.Tasks;
 
 namespace netCore_Begginer_testing
@@ -12,20 +13,20 @@ namespace netCore_Begginer_testing
     public class DailyTasksTestCase
     {
         private readonly Mock<ITaskManager<DailyTasks, string>> _mockTaskService;
-        private readonly Mock<ITaskManager<EditDailyTasks, string>> _mockTaskManager;
-
+        private readonly Mock<ProductDbContext> _mockProductDbContext;
         private readonly DailyTasksController dailyTasksController;
 
         public DailyTasksTestCase()
         {
             _mockTaskService = new Mock<ITaskManager<DailyTasks, string>>();
-            _mockTaskManager = new Mock<ITaskManager<EditDailyTasks, string>>();
-            dailyTasksController = new DailyTasksController(_mockTaskService.Object, _mockTaskManager.Object);
+            _mockProductDbContext = new Mock<ProductDbContext>();
+            dailyTasksController = new DailyTasksController(_mockTaskService.Object); 
         }
 
         [Fact]
         public async Task AddTask_ShouldReturnOk_WhenValidTaskIsProvided()
         {
+            
             var task = new DailyTasks
             {
                 Task_id = "BG-234",
@@ -34,16 +35,16 @@ namespace netCore_Begginer_testing
                 Status = "Done",
                 Email = "sana@ee.com",
                 Assignee = "Sana Syed",
-                Attachments = null,
-                File_name = "Test",
                 Description = "Test"
             };
 
             _mockTaskService.Setup(s => s.AddTheData(task)).Returns(Task.CompletedTask);
 
             var result = await dailyTasksController.AddTask(task);
-            var okResult = Assert.IsType<OkResult>(result);
-            _mockTaskService.Verify(service => service.AddTheData(It.IsAny<DailyTasks>()), Times.Once);
+            Assert.IsType<OkResult>(result);
+
+            _mockTaskService.Verify(service => service.AddTheData(task), Times.Once);
+
         }
 
         [Fact]
@@ -59,24 +60,28 @@ namespace netCore_Begginer_testing
         [Fact]
         public async Task EditTask_ShouldReturnOk_WhenValidDataIsProvided()
         {
-            var taskId = "BG-234";
-            var task = new EditDailyTasks
+            // Arrange
+            string taskId = "BG-234";
+
+            var editTask = new EditDailyTasks
             {
                 Task_name = "Test",
                 Issue_type = "Bug",
                 Status = "Done",
                 Assignee = "Sana Syed",
-                Attachments = null,
-                File_name = "Test",
                 Description = "Test"
             };
 
-            _mockTaskManager.Setup(s => s.EditTheData(task, taskId)).Returns(Task.CompletedTask);
-            var result = await dailyTasksController.EditTask(taskId, task);
+            _mockTaskService.Setup(s => s.EditTheData(It.IsAny<DailyTasks>(), taskId))
+                            .Returns(Task.CompletedTask);
+
+
+            var result = await dailyTasksController.EditTask(taskId, editTask);
 
             var okResult = Assert.IsType<OkResult>(result);
-            _mockTaskManager.Verify(service => service.EditTheData(It.IsAny<EditDailyTasks>(), It.IsAny<string>()), Times.Once);
+            _mockTaskService.Verify(service => service.EditTheData(It.IsAny<DailyTasks>(), taskId), Times.Once);
         }
+
 
 
         [Fact]
@@ -130,8 +135,6 @@ namespace netCore_Begginer_testing
                 Status = "Done",
                 Email = "sana@ee.com",
                 Assignee = "Sana Syed",
-                Attachments = null,
-                File_name = "Test",
                 Description = "Test"
             };
 
@@ -170,8 +173,6 @@ namespace netCore_Begginer_testing
                  Status = "Done",
                  Email = "sana@ee.com",
                  Assignee = "Sana Syed",
-                 Attachments = null,
-                 File_name = "Test",
                  Description = "Test"
                 },
                 new DailyTasks
@@ -183,8 +184,6 @@ namespace netCore_Begginer_testing
                  Status = "In-Progress",
                  Email = "sana@123.com",
                  Assignee = "Sana",
-                 Attachments = null,
-                 File_name = "Test",
                  Description = "Test"
                 }
                

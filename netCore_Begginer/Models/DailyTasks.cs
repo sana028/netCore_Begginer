@@ -23,9 +23,6 @@ namespace netCore_Begginer.Models
 
         public string? Description { get; set; }
 
-        public string? File_name { get; set; }
-
-        public byte[]? Attachments { get; set; }
     }
 
     public class EditDailyTasks
@@ -40,8 +37,5 @@ namespace netCore_Begginer.Models
 
         public string? Description { get; set; }
 
-        public string? File_name { get; set; }
-
-        public byte[]? Attachments { get; set; }
     }
 }

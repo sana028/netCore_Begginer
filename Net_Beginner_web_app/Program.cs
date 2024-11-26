@@ -13,6 +13,7 @@ builder.Services.AddHttpClient("ApiClient", client =>
 {
     client.BaseAddress = new Uri(builder.Configuration["ApiBaseUrl"]);
 }).AddHttpMessageHandler<ApiService>();
+
 builder.Services.AddDistributedMemoryCache();
 
 builder.Services.AddScoped<IDataStore,DataStore>();
@@ -23,6 +24,10 @@ builder.Services.AddSession(options =>
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
+// Configure logging providers
+builder.Logging.ClearProviders(); // Optional: Clear default providers
+builder.Logging.AddConsole(); // Add Console logger
+builder.Logging.AddDebug();
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddTransient<ApiService>();

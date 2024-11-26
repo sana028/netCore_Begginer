@@ -12,12 +12,10 @@ namespace netCore_Begginer.Controllers
     {
 
         private readonly ITaskManager<DailyTasks, string> _tasks;
-        private readonly ITaskManager<EditDailyTasks, string> _taskManager;
 
-        public DailyTasksController(ITaskManager<DailyTasks, string> tasks,ITaskManager<EditDailyTasks,string>taskManager)
+        public DailyTasksController(ITaskManager<DailyTasks, string> tasks)
         {
             _tasks = tasks;
-            _taskManager = taskManager;
         }
 
         [Authorize]
@@ -49,8 +47,6 @@ namespace netCore_Begginer.Controllers
                     Issue_type = tasks.Issue_type,
                     Status = tasks.Status,
                     Assignee = tasks.Assignee,
-                    File_name = tasks.File_name,
-                    Attachments = tasks.Attachments,
                     Description = tasks.Description,
                 };
                 await _tasks.EditTheData(dailyTasks, id);

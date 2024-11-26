@@ -23,9 +23,6 @@ namespace Net_Beginner_web_app.Models
 
         public string? Description { get; set; }
 
-        public string? File_name { get; set; }
-
-        public byte[] Attachments { get; set; }
     }
 
     public class EditTasks
@@ -45,8 +42,5 @@ namespace Net_Beginner_web_app.Models
 
         public string? Description { get; set; }
 
-        public string? File_name { get; set; }
-
-        public byte[] Attachments { get; set; }
     }
 }

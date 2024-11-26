@@ -11,21 +11,20 @@ namespace Net_Beginner_web_app.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
         private readonly IDataStore _dataStore;
         private readonly ApiNotification<DailyTasks> apiNotification;
         private readonly ApiNotification<List<DailyTasks>> allListInfo;
         private readonly TaskApiActions _taskApiActions;
         private readonly ITaskDataServices _taskDataServices;
+        private readonly ILogger<HomeController> _logger;
 
         public HomeController(ILogger<HomeController> logger, IHttpClientFactory httpFactory, IDataStore dataStore, ApiNotification<List<DailyTasks>> listInfo,ApiNotification<DailyTasks> api, TaskApiActions taskApiActions, ITaskDataServices taskDataServices)
         {
-            _logger = logger;
             _dataStore = dataStore;
             apiNotification = api;
             _taskApiActions = taskApiActions;
             allListInfo = listInfo;
-
+            _logger = logger;
             api.Toaster += Toaster;
             allListInfo.Toaster += Toaster;
             _taskDataServices = taskDataServices;
@@ -37,7 +36,7 @@ namespace Net_Beginner_web_app.Controllers
             if (allTasksList?.Count == 0)
             {
                 var userEmail = _dataStore.GetTheUserDataFromSession();
-
+                _logger.LogInformation($"user Email hello {userEmail}");
                 var data = await allListInfo.ExecuteApiCall(() =>
                     _taskApiActions.GetallData($"/api/DailyTasks/getalltasks/{userEmail}"), "GetAll");
                 _taskDataServices?.setAllDailyTasks(data);
