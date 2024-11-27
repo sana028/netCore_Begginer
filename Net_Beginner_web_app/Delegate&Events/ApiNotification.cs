@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Net_Beginner_web_app.Models;
 
 namespace Net_Beginner_web_app.Delegate_Events
 {
@@ -15,17 +16,18 @@ namespace Net_Beginner_web_app.Delegate_Events
                 dynamic result = await apiCall();
                 //T r = await apiCall();
 
-                if (result !=null && result?.Count !=0)
+                if (result !=null)
                 {
-                    Toaster?.Invoke($"{action} Task completed successfully", "success")?.ToString();
-                    return result;
+         
+                        Toaster?.Invoke($"{action} Task completed successfully", "success")?.ToString();
+                   
                 }
                 return result;
             }
             catch (Exception ex)
             {
                 // Show error toaster
-                Toaster?.Invoke("An error occurred",ex.Message)?.ToString();
+                Toaster?.Invoke(ex.Message,"error")?.ToString();
                 throw;
             }
             Toaster?.EndInvoke(null);

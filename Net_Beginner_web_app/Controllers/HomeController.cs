@@ -82,7 +82,7 @@ namespace Net_Beginner_web_app.Controllers
 
         public async Task<IActionResult> EditTask(string taskID)
         {
-            var taskIDData = await apiNotification.ExecuteApiCall(() => _taskApiActions.GetAsync("/api/DailyTasks/getTaskInfo/", taskID), "GetTask");
+            var taskIDData = await apiNotification.ExecuteApiCall(() => _taskApiActions.GetAsync("/api/DailyTasks/getTaskInfo/", taskID), "Updated");
             var issueTypes = Enum.GetValues(typeof(IssueTypes))
                             .Cast<IssueTypes>()
                             .Select(e => e.ToString())
