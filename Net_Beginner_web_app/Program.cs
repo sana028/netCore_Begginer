@@ -44,6 +44,8 @@ if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+    //This middleware adds HTTP Strict Transport Security (HSTS) headers to the response, enforcing HTTPS usage.
+    //Even if a user types http://yoursite.com, the browser remembers to upgrade the connection to https://yoursite.com automatically.
     app.UseHsts();
 }
 
