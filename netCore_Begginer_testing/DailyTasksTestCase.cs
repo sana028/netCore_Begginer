@@ -13,13 +13,11 @@ namespace netCore_Begginer_testing
     public class DailyTasksTestCase
     {
         private readonly Mock<ITaskManager<DailyTasks, string>> _mockTaskService;
-        private readonly Mock<ProductDbContext> _mockProductDbContext;
         private readonly DailyTasksController dailyTasksController;
 
         public DailyTasksTestCase()
         {
             _mockTaskService = new Mock<ITaskManager<DailyTasks, string>>();
-            _mockProductDbContext = new Mock<ProductDbContext>();
             dailyTasksController = new DailyTasksController(_mockTaskService.Object); 
         }
 

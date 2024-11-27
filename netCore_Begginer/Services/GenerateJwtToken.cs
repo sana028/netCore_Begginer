@@ -26,7 +26,7 @@ namespace netCore_Begginer.Services
 
             var claims = new List<Claim>{
                 new Claim("Email",JwtRegisteredClaimNames.Email,email),
-                new Claim("Role",JwtHeaderParameterNames.Jku,role)
+                new Claim(ClaimTypes.Role, role)
             };
 
             var key = new SymmetricSecurityKey(
