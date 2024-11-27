@@ -44,6 +44,7 @@ builder.Services.AddSwaggerGen(swagger =>
     });
 
     // Add security requirement
+    //Swagger understands that API endpoints require a valid Bearer token in the Authorization
     swagger.AddSecurityRequirement(new OpenApiSecurityRequirement
             {
                 {
