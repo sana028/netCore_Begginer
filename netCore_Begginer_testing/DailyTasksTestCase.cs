@@ -12,13 +12,13 @@ namespace netCore_Begginer_testing
 {
     public class DailyTasksTestCase
     {
-        private readonly Mock<ITaskManager<DailyTasks, string>> _mockTaskService;
-        private readonly DailyTasksController dailyTasksController;
+        private readonly Mock<IBaseManager<DailyTasks, string>> MockTaskService;
+        private readonly DailyTasksController DailyTasksController;
 
         public DailyTasksTestCase()
         {
-            _mockTaskService = new Mock<ITaskManager<DailyTasks, string>>();
-            dailyTasksController = new DailyTasksController(_mockTaskService.Object); 
+            MockTaskService = new Mock<IBaseManager<DailyTasks, string>>();
+            DailyTasksController = new DailyTasksController(MockTaskService.Object); 
         }
 
         [Fact]
@@ -36,12 +36,12 @@ namespace netCore_Begginer_testing
                 Description = "Test"
             };
 
-            _mockTaskService.Setup(s => s.AddTheData(task)).Returns(Task.CompletedTask);
+            MockTaskService.Setup(s => s.AddTheData(task)).Returns(Task.CompletedTask);
 
-            var result = await dailyTasksController.AddTask(task);
+            var result = await DailyTasksController.AddTask(task);
             Assert.IsType<OkResult>(result);
 
-            _mockTaskService.Verify(service => service.AddTheData(task), Times.Once);
+            MockTaskService.Verify(service => service.AddTheData(task), Times.Once);
 
         }
 
@@ -50,7 +50,7 @@ namespace netCore_Begginer_testing
         {
             DailyTasks tasks = null;
 
-            var result = await dailyTasksController.AddTask(tasks);
+            var result = await DailyTasksController.AddTask(tasks);
 
             Assert.IsType<BadRequestResult>(result);
         }
@@ -70,14 +70,14 @@ namespace netCore_Begginer_testing
                 Description = "Test"
             };
 
-            _mockTaskService.Setup(s => s.EditTheData(It.IsAny<DailyTasks>(), taskId))
+            MockTaskService.Setup(s => s.EditTheData(It.IsAny<DailyTasks>(), taskId))
                             .Returns(Task.CompletedTask);
 
 
-            var result = await dailyTasksController.EditTask(taskId, editTask);
+            var result = await DailyTasksController.EditTask(taskId, editTask);
 
             var okResult = Assert.IsType<OkResult>(result);
-            _mockTaskService.Verify(service => service.EditTheData(It.IsAny<DailyTasks>(), taskId), Times.Once);
+            MockTaskService.Verify(service => service.EditTheData(It.IsAny<DailyTasks>(), taskId), Times.Once);
         }
 
 
@@ -89,7 +89,7 @@ namespace netCore_Begginer_testing
             EditDailyTasks tasks = null;
 
 
-            var result = await dailyTasksController.EditTask(Id, tasks);
+            var result = await DailyTasksController.EditTask(Id, tasks);
 
             Assert.IsType<BadRequestResult>(result);
         }
@@ -99,13 +99,13 @@ namespace netCore_Begginer_testing
         {
             string taskId = "BG-234";
 
-            _mockTaskService.Setup(s=>s.DeleteTheData(taskId)).Returns(Task.CompletedTask);
+            MockTaskService.Setup(s=>s.DeleteTheData(taskId)).Returns(Task.CompletedTask);
 
-            var result = await dailyTasksController.DeleteTask(taskId);
+            var result = await DailyTasksController.DeleteTask(taskId);
 
             // Assert
             var okResult = Assert.IsType<OkResult>(result);
-            _mockTaskService.Verify(service => service.DeleteTheData(It.IsAny<string>()), Times.Once);
+            MockTaskService.Verify(service => service.DeleteTheData(It.IsAny<string>()), Times.Once);
         }
 
         [Fact]
@@ -115,7 +115,7 @@ namespace netCore_Begginer_testing
             string taskId = null;
 
             // Act
-            var result = await dailyTasksController.DeleteTask(taskId);
+            var result = await DailyTasksController.DeleteTask(taskId);
 
             // Assert
             Assert.IsType<BadRequestResult>(result);
@@ -136,10 +136,10 @@ namespace netCore_Begginer_testing
                 Description = "Test"
             };
 
-            _mockTaskService.Setup(service => service.GetTheData(It.IsAny<string>()))
+            MockTaskService.Setup(service => service.GetTheData(It.IsAny<string>()))
                    .ReturnsAsync(task);
 
-            var result = await dailyTasksController.GetTaskData(taskId);
+            var result = await DailyTasksController.GetTaskData(taskId);
 
             var okResult = Assert.IsType<OkObjectResult>(result.Result);
             var returnedTask = Assert.IsType<DailyTasks>(okResult.Value);
@@ -151,7 +151,7 @@ namespace netCore_Begginer_testing
         {
             string taskId = null;
 
-            var result = await dailyTasksController.GetTaskData(taskId);
+            var result = await DailyTasksController.GetTaskData(taskId);
 
             Assert.IsType<BadRequestResult>(result.Result);
         }
@@ -186,11 +186,11 @@ namespace netCore_Begginer_testing
                 }
                
             };
-            _mockTaskService.Setup(service => service.GetAllTheData(email))
+            MockTaskService.Setup(service => service.GetAllTheData("Email", email))
                     .ReturnsAsync(tasks); 
 
             // Act
-            var result = await dailyTasksController.GetAllTasks(email);
+            var result = await DailyTasksController.GetAllTasks(email);
 
             // Assert
             var okResult = Assert.IsType<OkObjectResult>(result.Result);
@@ -206,7 +206,7 @@ namespace netCore_Begginer_testing
             string email = null;
 
            
-            var result = await dailyTasksController.GetAllTasks(email);
+            var result = await DailyTasksController.GetAllTasks(email);
 
             var badRequestResult = Assert.IsType<BadRequestResult>(result.Result);
 

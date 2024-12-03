@@ -11,11 +11,11 @@ namespace netCore_Begginer.Controllers
     public class DailyTasksController : ControllerBase
     {
 
-        private readonly ITaskManager<DailyTasks, string> _tasks;
+        private readonly IBaseManager<DailyTasks, string> Tasks;
 
-        public DailyTasksController(ITaskManager<DailyTasks, string> tasks)
+        public DailyTasksController(IBaseManager<DailyTasks, string> tasks)
         {
-            _tasks = tasks;
+            Tasks = tasks;
         }
 
         [Authorize]
@@ -24,7 +24,7 @@ namespace netCore_Begginer.Controllers
         {
             if (task != null)
             {
-                await _tasks.AddTheData(task);
+                await Tasks.AddTheData(task);
                 return Ok();
             }
             else
@@ -40,6 +40,7 @@ namespace netCore_Begginer.Controllers
         {
             if (tasks != null && !string.IsNullOrEmpty(id))
             {
+
                 var dailyTasks = new DailyTasks
                 {
                     Task_id = id,
@@ -49,7 +50,7 @@ namespace netCore_Begginer.Controllers
                     Assignee = tasks.Assignee,
                     Description = tasks.Description,
                 };
-                await _tasks.EditTheData(dailyTasks, id);
+                await Tasks.EditTheData(dailyTasks, id);
                 return Ok();
             }
             else
@@ -64,7 +65,7 @@ namespace netCore_Begginer.Controllers
         {
             if(!string.IsNullOrEmpty(TaskId))
             {
-                await _tasks.DeleteTheData(TaskId);
+                await Tasks.DeleteTheData(TaskId);
                 return Ok();
             }
             else
@@ -78,7 +79,7 @@ namespace netCore_Begginer.Controllers
         {
             if(!string.IsNullOrEmpty(id))
             {
-                var taskData = await _tasks.GetTheData(id);
+                var taskData = await Tasks.GetTheData(id);
                 return Ok(taskData);
             }
             else
@@ -94,7 +95,7 @@ namespace netCore_Begginer.Controllers
         {
             if(!string.IsNullOrEmpty(email))
             {
-                var data = await _tasks.GetAllTheData(email);
+                var data = await Tasks.GetAllTheData("Email",email);
 
                 return Ok(data);
             }else

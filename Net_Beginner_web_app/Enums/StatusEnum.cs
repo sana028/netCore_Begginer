@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel;
 
-namespace netCore_Begginer.Models.Tasks
+namespace Net_Beginner_web_app.Enums
 {
-    public enum Status
+    public enum StatusEnum
     {
         //Use an attribute like [Description] from System.ComponentModel to store a display-friendly name
         [Description("To-Do")]

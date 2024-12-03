@@ -18,9 +18,7 @@ namespace Net_Beginner_web_app.Delegate_Events
 
                 if (result !=null)
                 {
-         
-                        Toaster?.Invoke($"{action} Task completed successfully", "success")?.ToString();
-                   
+                    Toaster?.Invoke($"{action} Task completed successfully", "success")?.ToString();
                 }
                 return result;
             }

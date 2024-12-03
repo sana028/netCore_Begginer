@@ -1,17 +1,10 @@
-﻿namespace netCore_Begginer.Models.Tasks
-{
-    public enum IssueTypes
-    {
-        Bug,
-        Feature,
-        Task,
-        Story,
-        Epic
-    }
+﻿using Net_Beginner_web_app.Enums;
 
+namespace netCore_Begginer.Models.Tasks
+{
     public class IssueType
     {
-        public required IssueTypes IssueTypes {  get; set; }
+        public required IssueTypeEnum IssueTypes {  get; set; }
 
         public string? IconName { get; set; }
 

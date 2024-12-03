@@ -10,16 +10,16 @@ namespace netCore_Begginer.Services
 {
     public class GenerateJwtToken :IGenerateJwtToken
     {
-        private readonly IConfiguration _configuration;
+        private readonly IConfiguration Configuration;
 
         public GenerateJwtToken(IConfiguration configuration)
         {
-            _configuration = configuration;
+            Configuration = configuration;
         }
 
         public virtual string GenerateToken(string role,string email)
         {
-            var jwtSettings = _configuration.GetSection("JwtSettings");
+            var jwtSettings = Configuration.GetSection("JwtSettings");
             var issuer = jwtSettings["Issuer"];
             var audience = jwtSettings["Audience"];
             var secretKey = jwtSettings["SecretKey"];

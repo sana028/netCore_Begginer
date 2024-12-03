@@ -10,26 +10,19 @@ namespace netCore_Begginer.Controllers
     [ApiController]
     public class UserValidationController : ControllerBase
     {
-        private readonly ProductDbContext _context;
-        private readonly IGenerateJwtToken generateJwtToken;
-
-     
+        private readonly ProductDbContext ProductDbContext;
+        private readonly IGenerateJwtToken GenerateJwtToken;
 
         public UserValidationController(ProductDbContext context,IGenerateJwtToken generateJwt)
         {
-            _context = context;
-            generateJwtToken = generateJwt;
+            ProductDbContext = context;
+            GenerateJwtToken = generateJwt;
         }
-
-        public GenerateJwtToken Object { get; }
 
         [HttpPost("login")]
         public  IActionResult Login([FromBody]Login user)
         {
-            var list  = from obj in _context.UserAuthentication
-                        where obj.Email == user.Email && obj.Password == user.Password
-                        select obj;
-            var validateUser = _context.UserAuthentication
+            var validateUser = ProductDbContext.UserAuthentication
                    ?.Where(userData => userData.Email == user.Email && userData.Password == user.Password).FirstOrDefault();
             if (validateUser == null)
             {
@@ -37,10 +30,9 @@ namespace netCore_Begginer.Controllers
             }
             else
             {
-                var token = generateJwtToken.GenerateToken(validateUser.Role, validateUser.Email);
+                var token = GenerateJwtToken.GenerateToken(validateUser.Role, validateUser.Email);
                 if (!string.IsNullOrEmpty(token))
                 {
-
                     return Ok(new LoginResponse{ Token =  token });
                 }
             }

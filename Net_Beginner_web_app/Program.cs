@@ -16,7 +16,7 @@ builder.Services.AddHttpClient("ApiClient", client =>
 
 builder.Services.AddDistributedMemoryCache();
 
-builder.Services.AddScoped<IDataStore,DataStore>();
+builder.Services.AddScoped<ISessionStore, SessionStoreRepository>();
 
 builder.Services.AddSession(options =>
 {
@@ -34,7 +34,7 @@ builder.Services.AddTransient<ApiService>();
 builder.Services.AddScoped<ApiNotification<DailyTasks>>();
 builder.Services.AddScoped<ApiNotification<bool>>();
 builder.Services.AddScoped<ApiNotification<List<DailyTasks>>>();
-builder.Services.AddSingleton<ITaskDataServices, StoreTaskDataService>();
+builder.Services.AddSingleton<IDataServices, StoreTaskDataService>();
 builder.Services.AddTransient<TaskApiActions>();
 
 var app = builder.Build();

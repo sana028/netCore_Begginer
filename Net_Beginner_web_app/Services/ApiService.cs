@@ -2,15 +2,15 @@
 {
     public class ApiService :DelegatingHandler
     {
-        private readonly IHttpContextAccessor _contextAccessor;
+        private readonly IHttpContextAccessor ContextAccessor;
 
         public ApiService(IHttpContextAccessor contextAccessor) {
-            _contextAccessor = contextAccessor;
+            ContextAccessor = contextAccessor;
         }
 
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            var token = _contextAccessor.HttpContext?.Session.GetString("authToken");
+            var token = ContextAccessor.HttpContext?.Session.GetString("authToken");
             if (!string.IsNullOrEmpty(token))
             {
                 request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);

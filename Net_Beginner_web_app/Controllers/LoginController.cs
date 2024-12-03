@@ -8,15 +8,15 @@ namespace Net_Beginner_web_app.Controllers
 {
     public class LoginController : Controller
     {
-        private readonly HttpClient _httpClient;
-        private readonly IDataStore _dataStore;
-        private readonly ILogger<LoginController> _logger;   
+        private readonly HttpClient HttpClient;
+        private readonly ISessionStore DataStore;
+        private readonly ILogger<LoginController> Logger;   
 
-        public LoginController(IHttpClientFactory httpFactory,IDataStore dataStore,ILogger<LoginController>logger)
+        public LoginController(IHttpClientFactory httpFactory,ISessionStore dataStore,ILogger<LoginController>logger)
         {
-            _httpClient = httpFactory.CreateClient("ApiClient");
-            _dataStore = dataStore;
-            _logger = logger;
+            HttpClient = httpFactory.CreateClient("ApiClient");
+            DataStore = dataStore;
+            Logger = logger;
         }
         public IActionResult Login()
         {
@@ -26,24 +26,24 @@ namespace Net_Beginner_web_app.Controllers
         [HttpPost]
         public async Task<IActionResult> Login(Login login)
         {
-            var response = await _httpClient.PostAsJsonAsync("/UserValidation/login",login);
+            var response = await HttpClient.PostAsJsonAsync("/UserValidation/login",login);
             try
             {
                 if (response.IsSuccessStatusCode)
                 {
-                    _logger.LogInformation($"Authenticating user with login credetials{login}");
+                    Logger.LogInformation($"Authenticating user with login credetials{login}");
                     var jsonResponse = await response.Content.ReadAsStringAsync();
                     var jsonDocument = JsonDocument.Parse(jsonResponse);
                     var token = jsonDocument.RootElement.GetProperty("token").GetString();
-                    _dataStore.StoreAuthenticationToken(token);
-                    _dataStore.StoreUserDataInSession(login.Email);
+                    DataStore.StoreAuthenticationToken(token);
+                    DataStore.StoreUserDataInSession(login.Email);
 
                     return RedirectToAction("Index", "Home");
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex,"Service: Error retrieving tasks");
+                Logger.LogError(ex,"Service: Error retrieving tasks");
             }
             return View();
         }

@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Net_Beginner_web_app.Delegate_Events;
+using Net_Beginner_web_app.Enums;
 using Net_Beginner_web_app.Interfaces;
 using Net_Beginner_web_app.Models;
-using netCore_Begginer.Models.Tasks;
 using System.Diagnostics;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -11,35 +11,35 @@ namespace Net_Beginner_web_app.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly IDataStore _dataStore;
-        private readonly ApiNotification<DailyTasks> apiNotification;
-        private readonly ApiNotification<List<DailyTasks>> allListInfo;
-        private readonly TaskApiActions _taskApiActions;
-        private readonly ITaskDataServices _taskDataServices;
-        private readonly ILogger<HomeController> _logger;
+        private readonly ISessionStore DataStore;
+        private readonly ApiNotification<DailyTasks> ApiNotification;
+        private readonly ApiNotification<List<DailyTasks>> ApiListNotification ;
+        private readonly TaskApiActions TaskApiActions;
+        private readonly IDataServices TaskDataServices;
+        private readonly ILogger<HomeController> Logger;
 
-        public HomeController(ILogger<HomeController> logger, IHttpClientFactory httpFactory, IDataStore dataStore, ApiNotification<List<DailyTasks>> listInfo,ApiNotification<DailyTasks> api, TaskApiActions taskApiActions, ITaskDataServices taskDataServices)
+        public HomeController(ILogger<HomeController> logger, IHttpClientFactory httpFactory, ISessionStore dataStore, ApiNotification<List<DailyTasks>> listInfo,ApiNotification<DailyTasks> api, TaskApiActions taskApiActions, IDataServices taskDataServices)
         {
-            _dataStore = dataStore;
-            apiNotification = api;
-            _taskApiActions = taskApiActions;
-            allListInfo = listInfo;
-            _logger = logger;
+            DataStore = dataStore;
+            ApiNotification = api;
+            TaskApiActions = taskApiActions;
+            ApiListNotification = listInfo;
+            Logger = logger;
             api.Toaster += Toaster;
-            allListInfo.Toaster += Toaster;
-            _taskDataServices = taskDataServices;
+            ApiListNotification.Toaster += Toaster;
+            TaskDataServices = taskDataServices;
         }
 
         public async Task<IActionResult> Index()
         {
-            var allTasksList = _taskDataServices?.getDailyTasks();
+            var allTasksList = TaskDataServices?.getDailyTasks();
             if (allTasksList?.Count == 0)
             {
-                var userEmail = _dataStore.GetTheUserDataFromSession();
-                _logger.LogInformation($"user Email hello {userEmail}");
-                var data = await allListInfo.ExecuteApiCall(() =>
-                    _taskApiActions.GetallData($"/api/DailyTasks/getalltasks/{userEmail}"), "GetAll");
-                _taskDataServices?.setAllDailyTasks(data);
+                var userEmail = DataStore.GetTheUserDataFromSession();
+                Logger.LogInformation($"user Email hello {userEmail}");
+                var data = await ApiListNotification.ExecuteApiCall(() =>
+                    TaskApiActions.GetallData($"/api/DailyTasks/getalltasks/{userEmail}"), "GetAll");
+                TaskDataServices?.setAllDailyTasks(data);
                 return View(data);
             }
 
@@ -48,12 +48,12 @@ namespace Net_Beginner_web_app.Controllers
 
         public IActionResult AddTask()
         {
-            var issueTypes = Enum.GetValues(typeof(IssueTypes))
-                            .Cast<IssueTypes>()
+            var issueTypes = Enum.GetValues(typeof(IssueTypeEnum))
+                            .Cast<IssueTypeEnum>()
                             .Select(e => e.ToString())
                             .ToList();
-            var status = Enum.GetValues(typeof(Status))
-                         .Cast<Status>()
+            var status = Enum.GetValues(typeof(StatusEnum))
+                         .Cast<StatusEnum>()
                          .Select(e => e.ToString())
                          .ToList();
 
@@ -69,9 +69,9 @@ namespace Net_Beginner_web_app.Controllers
 
             if (task != null)
             {
-                var userEmail = _dataStore.GetTheUserDataFromSession();
+                var userEmail = DataStore.GetTheUserDataFromSession();
                 task.Email = userEmail;
-                await allListInfo.ExecuteApiCall(() => _taskApiActions.PostAsync("/api/DailyTasks/add", task), "Add");
+                await ApiListNotification.ExecuteApiCall(() => TaskApiActions.PostAsync("/api/DailyTasks/add", task), "Add");
                 return RedirectToAction("Index");
                 
             }
@@ -82,13 +82,13 @@ namespace Net_Beginner_web_app.Controllers
 
         public async Task<IActionResult> EditTask(string taskID)
         {
-            var taskIDData = await apiNotification.ExecuteApiCall(() => _taskApiActions.GetAsync("/api/DailyTasks/getTaskInfo/", taskID), "Updated");
-            var issueTypes = Enum.GetValues(typeof(IssueTypes))
-                            .Cast<IssueTypes>()
+            var taskIDData = await ApiNotification.ExecuteApiCall(() => TaskApiActions.GetAsync("/api/DailyTasks/getTaskInfo/", taskID), "Updated");
+            var issueTypes = Enum.GetValues(typeof(IssueTypeEnum))
+                            .Cast<IssueTypeEnum>()
                             .Select(e => e.ToString())
                             .ToList();
-            var status = Enum.GetValues(typeof(Status))
-                         .Cast<Status>()
+            var status = Enum.GetValues(typeof(StatusEnum))
+                         .Cast<StatusEnum>()
                          .Select(e => e.ToString())
                          .ToList();
 
@@ -98,11 +98,11 @@ namespace Net_Beginner_web_app.Controllers
             return PartialView("AddTask",taskIDData);
         }
         [HttpPost]
-        public async Task<IActionResult> EditTask(EditTasks task)
+        public async Task<IActionResult> EditTask(EditDailyTasks task)
         {
             if (task != null)
             {
-                await allListInfo.ExecuteApiCall(() => _taskApiActions.PutAsync("/api/DailyTasks/edit/",task),"Edit");
+                await ApiListNotification.ExecuteApiCall(() => TaskApiActions.PutAsync("/api/DailyTasks/edit/",task),"Edit");
                 return RedirectToAction("Index");
 
             }
@@ -122,7 +122,7 @@ namespace Net_Beginner_web_app.Controllers
         {
             if(!string.IsNullOrEmpty(taskId))
             {
-               var result = await allListInfo.ExecuteApiCall(() => _taskApiActions.DeleteAsync("/api/DailyTasks/delete/", taskId),"Delete");
+               var result = await ApiListNotification.ExecuteApiCall(() => TaskApiActions.DeleteAsync("/api/DailyTasks/delete/", taskId),"Delete");
                 return RedirectToAction("Index");
             }
             return PartialView("DeleteTask");
@@ -136,7 +136,7 @@ namespace Net_Beginner_web_app.Controllers
         {
             if(!string.IsNullOrEmpty(taskId))
             {
-                var result = await apiNotification.ExecuteApiCall(() => _taskApiActions.GetAsync("/api/DailyTasks/getTaskInfo/",taskId),"GetTask");
+                var result = await ApiNotification.ExecuteApiCall(() => TaskApiActions.GetAsync("/api/DailyTasks/getTaskInfo/",taskId),"GetTask");
                 return PartialView(result);
             }
 

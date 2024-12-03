@@ -1,9 +1,11 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using netCore_Begginer.Interfaces;
+using netCore_Begginer.Mappings;
 using netCore_Begginer.Models;
 using netCore_Begginer.Repository;
 using netCore_Begginer.Services;
@@ -61,6 +63,8 @@ builder.Services.AddSwaggerGen(swagger =>
             });
 
 });
+builder.Services.AddAutoMapper(typeof(MappingProfile));
+
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
 var secretKey = jwtSettings["SecretKey"];
 
@@ -81,13 +85,12 @@ builder.Services.AddAuthentication("Bearer")
 
 
 builder.Services.AddScoped<IGenerateJwtToken,GenerateJwtToken>();
-builder.Services.AddScoped(typeof(ITaskManager<,>), typeof(TaskManager<,>));
+builder.Services.AddScoped(typeof(IBaseManager<,>), typeof(BaseManagerRepository<,>));
+
 
 var app = builder.Build();
 
 
-
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     // Configure Swagger JSON route
@@ -101,7 +104,7 @@ if (app.Environment.IsDevelopment())
     {
         endPoint.SwaggerEndpoint("/api/v1/swagger.json", "products");
         endPoint.SwaggerEndpoint("api/v2/swagger.json", "list");
-        endPoint.RoutePrefix = ""; // Swagger UI will be served at /api
+        endPoint.RoutePrefix = ""; 
     });
 }
 

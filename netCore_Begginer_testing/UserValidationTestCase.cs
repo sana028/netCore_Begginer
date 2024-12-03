@@ -10,13 +10,18 @@ namespace netCore_Begginer_testing
 {
     public class UserValidationTestCase
     {
+        private readonly Mock<IGenerateJwtToken> MockGenerateJwtToken;
+        private readonly Mock<ProductDbContext> MockProductDbContext;
+
+        public UserValidationTestCase()
+        {
+            MockGenerateJwtToken = new Mock<IGenerateJwtToken>();
+            MockProductDbContext = new Mock<ProductDbContext>();
+        }
+
         [Fact]
         public void Login_ReturnsOk_WithValidCredentials()
         {
-            var mockLoginAction = new Mock<IGenerateJwtToken>();
-            var mockContext = new Mock<ProductDbContext>();
-
-
             var testUser = new UserAuthentication
             {
                 Email = "valid@test.com",
@@ -24,13 +29,13 @@ namespace netCore_Begginer_testing
                 Role = "admin"
             };
 
-            mockLoginAction.Setup(s => s.GenerateToken("admin", "valid@test.com")).Returns("auth-token");
+            MockGenerateJwtToken.Setup(s => s.GenerateToken("admin", "valid@test.com")).Returns("auth-token");
 
-            mockContext.Setup(c => c.UserAuthentication)
+            MockProductDbContext.Setup(c => c.UserAuthentication)
                    .ReturnsDbSet(new List<UserAuthentication>{ testUser});
 
 
-            var userValidationController = new UserValidationController(mockContext.Object, mockLoginAction.Object);
+            var userValidationController = new UserValidationController(MockProductDbContext.Object, MockGenerateJwtToken.Object);
 
             var userInfo = new Login()
             {
@@ -48,15 +53,13 @@ namespace netCore_Begginer_testing
         [Fact]
         public void Login_ReturnsUnauthorized_WhenUserIsInvalid()
         {
-            var mockLoginAction = new Mock<IGenerateJwtToken>();
-            var mockContext = new Mock<ProductDbContext>();
-            mockContext.Setup(c => c.UserAuthentication)
+            MockProductDbContext.Setup(c => c.UserAuthentication)
                    .ReturnsDbSet(new List<UserAuthentication>());
 
-            mockLoginAction.Setup(s => s.GenerateToken("admin", "valid@test.com"))
+            MockGenerateJwtToken.Setup(s => s.GenerateToken("admin", "valid@test.com"))
                 .Returns("auth-token");
 
-            var userValidationController = new UserValidationController(mockContext.Object, mockLoginAction.Object);
+            var userValidationController = new UserValidationController(MockProductDbContext.Object, MockGenerateJwtToken.Object);
 
             var userInfo = new Login()
             {
@@ -72,8 +75,6 @@ namespace netCore_Begginer_testing
         [Fact]
         public void Login_ReturnsBadRequest_WhenTokenGenerationFails()
         {
-            var mockLoginAction = new Mock<IGenerateJwtToken>();
-            var mockContext = new Mock<ProductDbContext>();
 
             var testUser = new UserAuthentication
             {
@@ -81,13 +82,13 @@ namespace netCore_Begginer_testing
                 Password = "correctpassword",
                 Role = "admin"
             };
-            mockContext.Setup(c => c.UserAuthentication)
+            MockProductDbContext.Setup(c => c.UserAuthentication)
                    .ReturnsDbSet(new List<UserAuthentication>{ testUser});
 
-            mockLoginAction.Setup(s => s.GenerateToken("admin", "valid@test.com"))
+            MockGenerateJwtToken.Setup(s => s.GenerateToken("admin", "valid@test.com"))
                 .Returns(string.Empty);
 
-            var userValidationController = new UserValidationController(mockContext.Object, mockLoginAction.Object);
+            var userValidationController = new UserValidationController(MockProductDbContext.Object, MockGenerateJwtToken.Object);
 
             var userInfo = new Login()
             {

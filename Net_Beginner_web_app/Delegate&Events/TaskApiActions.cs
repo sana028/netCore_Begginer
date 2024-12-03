@@ -9,24 +9,23 @@ namespace Net_Beginner_web_app.Delegate_Events
 {
     public class TaskApiActions
     {
-        private readonly HttpClient _httpClient;
-        private static string getallDataUrl = "/api/DailyTasks/getalltasks/";
-        private static string userEmail = null;
-        private readonly  ITaskDataServices _taskServices;
-        private readonly ILogger<TaskApiActions> _logger;
+        private readonly HttpClient HttpClient;
+        private static string UserEmail = null;
+        private readonly  IDataServices TaskServices;
+        private readonly ILogger<TaskApiActions> Logger;
 
-        public TaskApiActions(IHttpClientFactory httpFactory,IDataStore data, ITaskDataServices taskServices, ILogger<TaskApiActions> logger)
+        public TaskApiActions(IHttpClientFactory httpFactory,ISessionStore data, IDataServices taskServices, ILogger<TaskApiActions> logger)
         {
-            _httpClient = httpFactory.CreateClient("ApiClient");
-            userEmail = data.GetTheUserDataFromSession();
-            _taskServices = taskServices;
-            _logger = logger;
+            HttpClient = httpFactory.CreateClient("ApiClient");
+            UserEmail = data.GetTheUserDataFromSession();
+            TaskServices = taskServices;
+            Logger = logger;
         }
 
         public async Task<DailyTasks> GetAsync(string url,string id)
         {
             if(!string.IsNullOrEmpty(id)) { 
-                var response = await _httpClient.GetAsync(url+$"{id}");
+                var response = await HttpClient.GetAsync(url+$"{id}");
                 if(response.IsSuccessStatusCode)
                 {
                     var json = await response.Content.ReadAsStringAsync();
@@ -35,13 +34,13 @@ namespace Net_Beginner_web_app.Delegate_Events
                     {
                         PropertyNameCaseInsensitive = true // Allows case-insensitive property matching
                     });
-                    _logger.LogInformation($"Fetched the Task details for the task-id {id}");
-                    return tasks;
+                    Logger.LogInformation($"Fetched the Task details for the task-id {id}");
 
+                    return tasks;
                 }
                 else
                 {
-                    _logger.LogError($"Got some error from the api {response}");
+                    Logger.LogError($"Got some error from the api {response}");
                     return null; 
                 }
             }
@@ -51,29 +50,29 @@ namespace Net_Beginner_web_app.Delegate_Events
         public async Task<List<DailyTasks>> PostAsync(string url,DailyTasks tasks)
         {
             if(!string.IsNullOrEmpty(url)&& tasks!=null) {
-                var response = await _httpClient.PostAsJsonAsync(url,tasks);
+                var response = await HttpClient.PostAsJsonAsync(url,tasks);
                 if(response.IsSuccessStatusCode)
                 {
-                    _logger.LogInformation($"Added data successfully to table {response.StatusCode}");
-                    _taskServices.setDailyTask(tasks);
+                    Logger.LogInformation($"Added data successfully to table {response.StatusCode}");
+                    TaskServices.setDailyTask(tasks);
                 }
                 else
                 {
-                    _logger.LogError($"{response.StatusCode}");
+                    Logger.LogError($"{response.StatusCode}");
                 }
             }
             return (new List<DailyTasks>()); ;
         }
 
-        public async Task<List<DailyTasks>>PutAsync(string url,EditTasks tasks)
+        public async Task<List<DailyTasks>>PutAsync(string url,EditDailyTasks tasks)
         {
             if(!string.IsNullOrEmpty(url) && tasks != null)
             {
-                var response = await _httpClient.PutAsJsonAsync(url+$"{tasks.Task_id}", tasks);
+                var response = await HttpClient.PutAsJsonAsync(url+$"{tasks.Task_id}", tasks);
                 if(response.IsSuccessStatusCode)
                 {
-                    _logger.LogInformation($"Updated data to the table for the task-id {tasks.Task_id},with status {response.StatusCode}");
-                    var allTasks =  _taskServices.getDailyTasks();
+                    Logger.LogInformation($"Updated data to the table for the task-id {tasks.Task_id},with status {response.StatusCode}");
+                    var allTasks =  TaskServices.getDailyTasks();
                     var list = new DailyTasks
                     {
                         Task_id = tasks.Task_id,
@@ -81,16 +80,16 @@ namespace Net_Beginner_web_app.Delegate_Events
                         Assignee = tasks.Assignee,
                         Issue_type = tasks.Issue_type,
                         Status = tasks.Status,
-                        Email = userEmail,
+                        Email = UserEmail,
                         Description = tasks.Description,
                     };
                     var taskIndex = allTasks.FindIndex(t => t.Task_id == tasks.Task_id);
                     allTasks[taskIndex] = list;
-                   _taskServices.setAllDailyTasks(allTasks);
+                   TaskServices.setAllDailyTasks(allTasks);
                 }
                 else
                 {
-                    _logger.LogError($"{response}");
+                    Logger.LogError($"{response}");
                 }
             }
             return (new List<DailyTasks>());
@@ -100,18 +99,18 @@ namespace Net_Beginner_web_app.Delegate_Events
         {
             if (!string.IsNullOrEmpty(url) && !string.IsNullOrEmpty(id))
             {
-                var response = await _httpClient.DeleteAsync(url + id);
+                var response = await HttpClient.DeleteAsync(url + id);
                 if (response.IsSuccessStatusCode)
                 {
-                    _logger.LogInformation($"Successfully deleted the task with the id {id},{response.StatusCode}");
-                    var allTasks = _taskServices.getDailyTasks();
+                    Logger.LogInformation($"Successfully deleted the task with the id {id},{response.StatusCode}");
+                    var allTasks = TaskServices.getDailyTasks();
                     var taskIndex = allTasks.FindIndex(t => t.Task_id == id);
                     allTasks.RemoveAt(taskIndex);
-                   _taskServices.setAllDailyTasks(allTasks);
+                   TaskServices.setAllDailyTasks(allTasks);
                 }
                 else
                 {
-                    _logger.LogError($"{response}");
+                    Logger.LogError($"{response}");
                 }
             }
             return (new List<DailyTasks>()); ;
@@ -121,10 +120,10 @@ namespace Net_Beginner_web_app.Delegate_Events
         {
             if(!string.IsNullOrEmpty(url))
             {
-                var response = await _httpClient.GetAsync(url);
+                var response = await HttpClient.GetAsync(url);
                 if (response.IsSuccessStatusCode)
                 {
-                    _logger.LogTrace($"Fetched all tasks of this user email {userEmail}");
+                    Logger.LogTrace($"Fetched all tasks of this user email {UserEmail}");
                     var json = await response.Content.ReadAsStringAsync();
 
                     var tasks = JsonSerializer.Deserialize<List<DailyTasks>>(json, new JsonSerializerOptions
@@ -136,7 +135,7 @@ namespace Net_Beginner_web_app.Delegate_Events
                 }
                 else
                 {
-                    _logger.LogError($"{response}");
+                    Logger.LogError($"{response}");
                 }
             }
 

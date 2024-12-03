@@ -1,28 +1,32 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using netCore_Begginer.Interfaces;
+using netCore_Begginer.Mappings;
 using netCore_Begginer.Models;
 using System.Collections.Generic;
 using System.Reflection.Metadata.Ecma335;
 
 namespace netCore_Begginer.Repository
 {
-    public class TaskManager<T,Type> : ITaskManager<T,Type> where T:class
+    public class BaseManagerRepository<T,Type> : IBaseManager<T,Type> where T:class
     {
-        private readonly ProductDbContext _productDb;
-        private DbSet<T> set {  get; set; }
+        private readonly ProductDbContext ProductDbContext;
+        private DbSet<T> Set {  get; set; }
+        private readonly IMapper Mapper;
 
-        public TaskManager(ProductDbContext productDb)
+        public BaseManagerRepository(ProductDbContext productDb, IMapper mapper)
         {
-            _productDb = productDb;
-            set = _productDb.Set<T>();
+            ProductDbContext = productDb;
+            Set = ProductDbContext.Set<T>();
+            Mapper = mapper;
         }
 
         public async Task AddTheData(T data)
         {
             try
             {
-                set.Add(data);
-                await _productDb.SaveChangesAsync();
+                Set.Add(data);
+                await ProductDbContext.SaveChangesAsync();
             }catch (Exception ex)
             {
                 throw new Exception(ex.Message);
@@ -33,24 +37,16 @@ namespace netCore_Begginer.Repository
         {
             try
             {
-                var existingData = await _productDb.Set<T>().FindAsync(id);
+                var existingData = await ProductDbContext.Set<T>().FindAsync(id);
+                var list = data;
                 if (existingData == null)
                 {
                     throw new Exception($"No data found with ID {id}");
                 }
-                //reflection 
-                foreach(var property in typeof(T).GetProperties())
-                {
-                    var value = property.GetValue(data);
-                    if (value!=null)
-                    {
-                        property.SetValue(existingData, value);
-                    }
-                }
 
-                _productDb.Entry(existingData).State = EntityState.Modified;
+               Mapper.Map(data,existingData);
 
-                await _productDb.SaveChangesAsync();
+                await ProductDbContext.SaveChangesAsync();
             }catch(Exception ex)
             {
                 throw new Exception(ex.Message);
@@ -59,13 +55,13 @@ namespace netCore_Begginer.Repository
 
         public async Task DeleteTheData(Type id)
         {
-            var deleteItem = await set.FindAsync(id);
+            var deleteItem = await Set.FindAsync(id);
             if (deleteItem != null)
             {
                 try
                 {
-                    set.Remove(deleteItem);
-                    await _productDb.SaveChangesAsync();
+                    Set.Remove(deleteItem);
+                    await ProductDbContext.SaveChangesAsync();
                 }catch(Exception ex)
                 {
                     throw new Exception(ex.Message);
@@ -78,7 +74,7 @@ namespace netCore_Begginer.Repository
             if (id != null) {
                 try
                 {
-                    return await set.FindAsync(id);
+                    return await Set.FindAsync(id);
                 }
                 catch (Exception ex)
                 {
@@ -88,9 +84,9 @@ namespace netCore_Begginer.Repository
             return null;
         }
 
-        public async Task<List<T>> GetAllTheData(Type email)
+        public async Task<List<T>> GetAllTheData(string propertyName,Type id)
         {
-            var list = await _productDb.Set<T>().Where(x => EF.Property<Type>(x, "Email").Equals(email)).ToListAsync();
+            var list = await ProductDbContext.Set<T>().Where(x => EF.Property<Type>(x, propertyName).Equals(id)).ToListAsync();
 
             if(list != null)
             {
