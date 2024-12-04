@@ -54,7 +54,7 @@ namespace Net_Beginner_web_app.Delegate_Events
                 if(response.IsSuccessStatusCode)
                 {
                     Logger.LogInformation($"Added data successfully to table {response.StatusCode}");
-                    TaskServices.setDailyTask(tasks);
+                    TaskServices.SetDailyTask(tasks);
                 }
                 else
                 {
@@ -72,7 +72,7 @@ namespace Net_Beginner_web_app.Delegate_Events
                 if(response.IsSuccessStatusCode)
                 {
                     Logger.LogInformation($"Updated data to the table for the task-id {tasks.Task_id},with status {response.StatusCode}");
-                    var allTasks =  TaskServices.getDailyTasks();
+                    var allTasks =  TaskServices.GetDailyTasks();
                     var list = new DailyTasks
                     {
                         Task_id = tasks.Task_id,
@@ -85,7 +85,7 @@ namespace Net_Beginner_web_app.Delegate_Events
                     };
                     var taskIndex = allTasks.FindIndex(t => t.Task_id == tasks.Task_id);
                     allTasks[taskIndex] = list;
-                   TaskServices.setAllDailyTasks(allTasks);
+                   TaskServices.SetAllDailyTasks(allTasks);
                 }
                 else
                 {
@@ -103,10 +103,10 @@ namespace Net_Beginner_web_app.Delegate_Events
                 if (response.IsSuccessStatusCode)
                 {
                     Logger.LogInformation($"Successfully deleted the task with the id {id},{response.StatusCode}");
-                    var allTasks = TaskServices.getDailyTasks();
+                    var allTasks = TaskServices.GetDailyTasks();
                     var taskIndex = allTasks.FindIndex(t => t.Task_id == id);
                     allTasks.RemoveAt(taskIndex);
-                   TaskServices.setAllDailyTasks(allTasks);
+                   TaskServices.SetAllDailyTasks(allTasks);
                 }
                 else
                 {

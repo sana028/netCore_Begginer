@@ -7,15 +7,15 @@ namespace Net_Beginner_web_app.Services
     {
         private List<DailyTasks> Tasks = new();
 
-        public void setDailyTask(DailyTasks task)
+        public void SetDailyTask(DailyTasks task)
         {
             Tasks.Add(task);
         }
-        public void setAllDailyTasks(List<DailyTasks> tasks)
+        public void SetAllDailyTasks(List<DailyTasks> tasks)
         {
             Tasks = tasks;
         }
-        public List<DailyTasks> getDailyTasks()
+        public List<DailyTasks> GetDailyTasks()
         {
             return Tasks;
         }

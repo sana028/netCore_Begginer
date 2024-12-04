@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using netCore_Begginer.Interfaces;
+using netCore_Begginer.Mappings;
 using netCore_Begginer.Models;
 
 namespace netCore_Begginer.Controllers
@@ -12,10 +13,12 @@ namespace netCore_Begginer.Controllers
     {
 
         private readonly IBaseManager<DailyTasks, string> Tasks;
+        private readonly TaskMapper TaskMapper;
 
         public DailyTasksController(IBaseManager<DailyTasks, string> tasks)
         {
             Tasks = tasks;
+            TaskMapper = new TaskMapper();
         }
 
         [Authorize]
@@ -40,16 +43,7 @@ namespace netCore_Begginer.Controllers
         {
             if (tasks != null && !string.IsNullOrEmpty(id))
             {
-
-                var dailyTasks = new DailyTasks
-                {
-                    Task_id = id,
-                    Task_name = tasks.Task_name,
-                    Issue_type = tasks.Issue_type,
-                    Status = tasks.Status,
-                    Assignee = tasks.Assignee,
-                    Description = tasks.Description,
-                };
+                var dailyTasks = TaskMapper.MapTasks(tasks, id);
                 await Tasks.EditTheData(dailyTasks, id);
                 return Ok();
             }
@@ -89,7 +83,7 @@ namespace netCore_Begginer.Controllers
         }
 
         [Authorize]
-        [HttpGet("getalltasks/{email}")]
+        [HttpGet("getAllTasks/{email}")]
 
         public async Task<ActionResult<DailyTasks>> GetAllTasks(string email)
         {

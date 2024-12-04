@@ -32,14 +32,14 @@ namespace Net_Beginner_web_app.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var allTasksList = TaskDataServices?.getDailyTasks();
+            var allTasksList = TaskDataServices?.GetDailyTasks();
             if (allTasksList?.Count == 0)
             {
                 var userEmail = DataStore.GetTheUserDataFromSession();
                 Logger.LogInformation($"user Email hello {userEmail}");
                 var data = await ApiListNotification.ExecuteApiCall(() =>
                     TaskApiActions.GetallData($"/api/DailyTasks/getalltasks/{userEmail}"), "GetAll");
-                TaskDataServices?.setAllDailyTasks(data);
+                TaskDataServices?.SetAllDailyTasks(data);
                 return View(data);
             }
 

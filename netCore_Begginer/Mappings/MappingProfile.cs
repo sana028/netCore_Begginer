@@ -10,5 +10,6 @@ namespace netCore_Begginer.Mappings
             CreateMap<DailyTasks, EditDailyTasks>()
                 .ForAllMembers(opts => opts.Condition((src, dest, srcMember, destMember) => srcMember != null && !Equals(srcMember, destMember)));
         }
+
     }
 }

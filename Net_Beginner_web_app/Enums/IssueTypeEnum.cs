@@ -2,10 +2,10 @@
 {
     public enum IssueTypeEnum
     {
-            Bug,
-            Feature,
-            Task,
-            Story,
-            Epic
+         Bug,
+         Feature,
+         Task,
+         Story,
+         Epic
     }
 }

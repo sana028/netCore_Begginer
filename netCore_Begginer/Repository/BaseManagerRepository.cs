@@ -5,6 +5,7 @@ using netCore_Begginer.Mappings;
 using netCore_Begginer.Models;
 using System.Collections.Generic;
 using System.Reflection.Metadata.Ecma335;
+using System.Threading.Tasks;
 
 namespace netCore_Begginer.Repository
 {
@@ -13,6 +14,7 @@ namespace netCore_Begginer.Repository
         private readonly ProductDbContext ProductDbContext;
         private DbSet<T> Set {  get; set; }
         private readonly IMapper Mapper;
+      
 
         public BaseManagerRepository(ProductDbContext productDb, IMapper mapper)
         {
@@ -38,7 +40,8 @@ namespace netCore_Begginer.Repository
             try
             {
                 var existingData = await ProductDbContext.Set<T>().FindAsync(id);
-                var list = data;
+
+                
                 if (existingData == null)
                 {
                     throw new Exception($"No data found with ID {id}");
